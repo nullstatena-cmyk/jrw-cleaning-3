@@ -37,10 +37,10 @@ function authorised(request, env) {
 function validate(body) {
   if (!body || typeof body !== 'object') return 'Malformed request body.';
   if (body.company_website) return 'Rejected.';           // honeypot tripped
-  const kind = body.kind === 'review' ? 'review' : 'bid';
+  const kind = body.kind === 'review' ? 'review' : 'quote';
   if (!body.name || String(body.name).length > 120) return 'Name is required.';
   if (!body.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(body.email)) return 'A valid email is required.';
-  if (kind === 'bid' && !body.property) return 'Property name is required.';
+  if (kind === 'quote' && !body.address) return 'A service address is required.';
   if (kind === 'review' && !body.body) return 'Review text is required.';
   if (JSON.stringify(body).length > 20000) return 'Submission too large.';
   return null;
@@ -85,7 +85,7 @@ export default {
       const problem = validate(body);
       if (problem) return json({ error: problem }, 400);
 
-      const kind = body.kind === 'review' ? 'review' : 'bid';
+      const kind = body.kind === 'review' ? 'review' : 'quote';
       const id = crypto.randomUUID();
       const received_at = new Date().toISOString();
 
